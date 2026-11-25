@@ -290,7 +290,7 @@ function studentSaved(){
 function studentMe(){
   const pct=S.xp%100, t2=top2(S.scores);
   return `<div class="p-4 space-y-4">
-    ${card(`<div class="flex items-center gap-4"><span class="grid place-items-center w-16 h-16 rounded-full bg-quest-50 text-3xl">🧑‍🎓</span><div class="flex-1"><p class="font-black text-lg">ゲストさん</p><p class="text-xs text-slate-500">Lv.${lv()}・★ ${S.xp} XP</p></div></div>
+    ${card(`<div class="flex items-center gap-4"><span class="grid place-items-center w-16 h-16 rounded-full bg-quest-50 text-3xl">🧑‍🎓</span><div class="flex-1"><p class="font-black text-lg">ゲストさん</p><p class="text-xs text-slate-500">Lv.${lv()}・★ ${S.xp}ポイント</p></div></div>
       <div class="mt-3 h-2 rounded-full bg-quest-100 overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-quest-500 to-pink-400" style="width:${pct}%"></div></div>
       <div class="mt-4 grid grid-cols-3 gap-2 text-center">${[['クリア',S.done.length+'/'+QUESTS.length],['気になる',S.saved.length],['得意の傾向',L(t2[0])]].map(([a,b])=>`<div class="rounded-xl bg-slate-50 py-3"><p class="text-[11px] text-slate-500">${a}</p><p class="font-bold ${String(b).length>4?'text-sm':''}">${b}</p></div>`).join('')}</div>`)}
     ${card(`<div class="flex items-center justify-between gap-3"><div><p class="font-bold text-sm">👨‍👩‍👧 保護者と共有</p><p class="text-xs text-slate-500 mt-0.5">${S.share?'あなたの関心の傾向が、保護者のカルテに表示されます':'いまは共有していません'}</p></div>
