@@ -228,7 +228,7 @@ function qRow(q){
   const d=S.done.includes(q.id);
   return `<div class="relative"><button data-act="start" data-id="${q.id}" class="w-full text-left rounded-2xl bg-white border border-slate-200 shadow-sm p-4 pr-16 flex items-center gap-4 active:scale-[.99] transition">
     <span class="grid place-items-center w-14 h-14 rounded-2xl bg-quest-50 text-3xl shrink-0">${q.emoji}</span>
-    <span class="flex-1 min-w-0"><span class="block font-bold">${q.title}</span><span class="block text-xs text-slate-500 mt-0.5">${q.cat}・約${q.min}分・+130 XP${d?'・✔クリア':''}</span></span></button>
+    <span class="flex-1 min-w-0"><span class="block font-bold">${q.title}</span><span class="block text-xs text-slate-500 mt-0.5">${q.cat}・約${q.min}分・+130ポイント${d?'・✔クリア':''}</span></span></button>
     <div class="absolute top-1/2 -translate-y-1/2 right-3">${heart('q:'+q.id)}</div></div>`;
 }
 function jRow(j){
@@ -255,7 +255,7 @@ function studentHome(){
   const chips=[['▶','続きから',undone[0]?`data-act="start" data-id="${undone[0].id}"`:'data-act="soon"'],['📝','きろく','data-act="tab" data-v="map"'],['👨‍👩‍👧','共有設定','data-act="tab" data-v="me"'],['🔔','お知らせ','data-act="bell"']];
   return `<div class="p-4 space-y-5">
     <div>
-      <div class="flex items-center justify-between"><p class="font-black text-lg">おかえり！</p><span class="px-3 py-1 rounded-full bg-quest-50 text-quest-700 text-xs font-bold">Lv.${lv()}・★${S.xp} XP</span></div>
+      <div class="flex items-center justify-between"><p class="font-black text-lg">おかえり！</p><span class="px-3 py-1 rounded-full bg-quest-50 text-quest-700 text-xs font-bold">Lv.${lv()}・★${S.xp}ポイント</span></div>
       <div class="mt-2 h-2 rounded-full bg-quest-100 overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-quest-500 to-pink-400" style="width:${pct}%"></div></div>
     </div>
     <button data-act="goSearch" class="w-full flex items-center gap-2 rounded-full bg-white border border-slate-200 px-4 py-3 text-sm text-slate-400 text-left shadow-sm"><span>🔎</span>気になる仕事・好きなことを検索</button>
@@ -322,7 +322,7 @@ function parentHome(){
   return `<div class="p-4 space-y-4">
     ${S.bannerOff?'':`<div class="relative rounded-2xl bg-spark-400/20 border border-spark-400/50 p-4 pr-10"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-400 text-white">NEW</span><p class="mt-1.5 text-sm font-bold leading-relaxed">親子で関心データを共有できる「ペアレント・カルテ」を公開しました</p><button data-act="dismiss" class="absolute top-3 right-3 text-slate-400 text-lg leading-none" aria-label="閉じる">×</button></div>`}
     ${!S.share?locked():`
-    ${card(h2('👦 お子さまの今週')+`<div class="grid grid-cols-3 gap-2 text-center">${[['クエスト',S.done.length+'本'],['レベル','Lv.'+lv()],['累計XP',S.xp]].map(([a,b])=>`<div class="rounded-xl bg-slate-50 py-3"><p class="text-[11px] text-slate-500">${a}</p><p class="font-bold">${b}</p></div>`).join('')}</div>
+    ${card(h2('👦 お子さまの今週')+`<div class="grid grid-cols-3 gap-2 text-center">${[['クリア',S.done.length+'本'],['レベル','Lv.'+lv()],['ふりかえり',Object.keys(S.reflect).length+'件']].map(([a,b])=>`<div class="rounded-xl bg-slate-50 py-3"><p class="text-[11px] text-slate-500">${a}</p><p class="font-bold">${b}</p></div>`).join('')}</div>
       <p class="mt-4 text-xs text-slate-500">いま目立っている関心</p><div class="mt-1.5 flex gap-2 flex-wrap">${t2.map(k=>`<span class="px-3 py-1 rounded-full bg-quest-50 text-quest-700 text-sm font-bold">${L(k)}</span>`).join('')}</div>`)}
     <div class="rounded-2xl bg-gradient-to-br from-spark-400/25 to-pink-400/25 border border-spark-400/40 p-4">
       <p class="text-xs font-bold text-slate-600">💬 今週のきっかけ質問</p>
@@ -401,14 +401,14 @@ function renderPlayer(){
     <div class="mt-4 space-y-2.5">${st.c.map((c,i)=>`<button data-act="choose" data-i="${i}" class="w-full text-left rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm hover:border-quest-500 hover:bg-quest-50 active:scale-[.99] transition">${c.t}</button>`).join('')}</div>`;
   } else if(phase==='fb'){
     const c=st.c[pick], k=Object.entries(c.s).sort((a,b)=>b[1]-a[1])[0][0], last=step===n-1;
-    body=`<div class="animate-pop"><p class="text-xs font-bold text-emerald-600">✨ NICE CHOICE！ +40 XP</p>
+    body=`<div class="animate-pop"><p class="text-xs font-bold text-emerald-600">✨ NICE CHOICE！ +40ポイント</p>
     <div class="mt-2 rounded-2xl bg-slate-50 border border-slate-200 p-4 text-sm leading-relaxed"><p class="font-bold">${c.t}</p><p class="mt-2 text-slate-600">${FB[k]}</p></div>
     ${st.ex?`<div class="mt-3 rounded-2xl bg-mint-500/10 border border-mint-500/40 p-4 text-sm leading-relaxed"><p class="text-xs font-bold text-emerald-700">👷 現場の担当者より</p><p class="mt-1">${st.ex}</p></div>`:''}
     <button data-act="next" class="mt-5 w-full py-3.5 rounded-xl bg-quest-600 text-white font-bold hover:bg-quest-700 transition">${last?'結果を見る 🎉':'次の場面へ →'}</button></div>`;
   } else {
     const t=top2(S.scores), R=S.reflect[q.id]||{why:[],next:[]};
     const chip=(g,v,on)=>`<button data-act="rtag" data-g="${g}" data-v="${v}" class="px-3 py-1.5 rounded-full text-xs font-bold border ${on?'bg-quest-600 text-white border-quest-600':'bg-white text-slate-600 border-slate-200'}">${on?'✓ ':''}${NEXTL(g,v)}</button>`;
-    body=`<div class="animate-pop text-center"><p class="text-5xl">🏆</p><p class="mt-2 text-xs font-bold text-quest-600">QUEST CLEAR！ +30 ボーナスXP</p>
+    body=`<div class="animate-pop text-center"><p class="text-5xl">🏆</p><p class="mt-2 text-xs font-bold text-quest-600">QUEST CLEAR！ +30ボーナスポイント</p>
     <h3 class="mt-1 text-xl font-black">あなたは<span class="text-quest-600">「${typeName(S.scores)}」</span></h3>
     <p class="text-xs text-slate-500">${L(t[0])}と${L(t[1])}が、いま目立っています</p>
     <div class="mt-4">${radar(S.scores,'w-full max-w-[220px]')}</div>
