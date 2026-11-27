@@ -66,7 +66,8 @@ const AX = [
 const L = k => AX.find(a => a.k === k).label;
 const NICK = { analysis:'しくみ探究', creative:'アイデア工房', empathy:'こころ寄り添い', challenge:'切りひらき', team:'つなぎ役' };
 const typeName = sc => { const t=Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k])=>NICK[k]); return t[0]+'×'+t[1]+'タイプ'; };
-const WHY = ['数字やデータを探るのが楽しかった','アイデアを出すのが楽しかった','相手の気持ちを考えるのが楽しかった','仲間と進めるのが楽しかった','思い切って挑戦するのが楽しかった','むずかしかった・ちょっと苦手かも'];
+const WHY = ['この作業は面白そうだと思った','もっと聞いてみたい仕事があった','知らなかった仕事の一面があった','数字やデータを調べるのが楽しかった','アイデアを出すのが楽しかった','人の気持ちを考えるのが楽しかった','仲間と進めるのが楽しかった','むずかしかった・ちょっと苦手かも'];
+const TELL = ['面白かったところを聞いてほしい','まだ決まっていなくても、否定せずに聞いてほしい','親の仕事や、昔の進路の話を聞かせてほしい','この仕事をどう思うか聞いてみたい','一緒に調べてほしい'];
 const NEXT = [['day','仕事の一日の流れ','この仕事は、1日どんな流れで進みますか？'],['work','職場の雰囲気・人間関係','どんな人と、どんな雰囲気で働いていますか？'],['cond','給料・休日・勤務時間','勤務時間や休日、シフトはどのくらい決まっていますか？'],['learn','学校の勉強とのつながり','今の学校の勉強は、この仕事のどこで役に立ちますか？'],['train','入社後の教育・相談先','入社後はどんな教育があり、困ったときは誰に相談できますか？']];
 const VALUES = ['給料','安定','休日・自由時間','人間関係','成長できる','好きなことに関われる','地元で働く','ものづくり'];
 const ROUTES = ['進学','就職','まだ決めていない'];
@@ -255,7 +256,7 @@ function talkCards(){
   return ids.map(id=>{
     const q=QUESTS.find(x=>x.id===id), c=S.reflect[id]||{why:[],next:[]}, p=S.preflect[id]||{why:[],ask:[]};
     const col=(t,lines)=>`<div class="rounded-xl bg-slate-50 p-3"><p class="text-[11px] font-bold text-slate-500">${t}</p>${lines.length?lines.map(l=>`<p class="mt-1 text-xs leading-relaxed">・${l}</p>`).join(''):'<p class="mt-1 text-xs text-slate-400">（まだありません）</p>'}</div>`;
-    const kid=showKid?[...c.why,...(c.next||[]).map(n=>'確かめたい：'+NEXTL('next',n))]:[];
+    const kid=showKid?[...(c.tell||[]).map(t=>'親に：'+t),...c.why,...(c.next||[]).map(n=>'確かめたい：'+NEXTL('next',n))]:[];
     return card(h2('💬 会話カード')+`<p class="text-sm font-bold">${q.emoji} ${q.title}</p><p class="text-[11px] text-emerald-600 font-bold mt-0.5">親子で同じクエストを終えました</p><div class="mt-3 grid grid-cols-2 gap-2">${col('高校生',kid)}${col('保護者',[...p.why,...(p.ask||[]).map(a=>'聞いてみたい：'+a)])}</div>${showKid?'':'<p class="mt-2 text-[11px] text-slate-400">高校生が共有をオフにしているため、高校生の感想は表示されません。</p>'}<p class="mt-3 text-sm rounded-xl bg-quest-50 px-3 py-2"><b>話してみよう：</b>「このクエスト、どこがおもしろかった？」から。答えは評価せず、まず聞くだけでOK。</p>`);
   }).join('');
 }
@@ -351,8 +352,9 @@ function parentHome(){
   </div>`;
 }
 function reflectCard(){
-  const all=Object.values(S.reflect), why=[...new Set(all.flatMap(r=>r.why))], nx=[...new Set(all.flatMap(r=>r.next||[]))];
-  return card(h2('🗒️ お子さまのひとこと')+(why.length||nx.length?`${why.length?`<p class="text-xs font-bold text-slate-500">やってみて感じたこと</p><p class="mt-1 text-sm">${why.join('／')}</p>`:''}${nx.length?`<p class="mt-3 text-xs font-bold text-slate-500">選ぶ前に確かめたいこと</p><div class="mt-1 flex flex-wrap gap-2">${nx.map(n=>`<span class="px-3 py-1 rounded-full bg-quest-50 text-quest-700 text-xs font-bold">${NEXTL('next',n)}</span>`).join('')}</div>`:''}`:`<p class="text-sm text-slate-500">お子さまがふりかえりを書くと、ここに表示されます。</p>`)+`<p class="mt-3 text-[11px] text-slate-400">本人が共有している感想だけが届きます。進み具合やタイプ・数値は表示されません。</p>`);
+  const all=Object.values(S.reflect), why=[...new Set(all.flatMap(r=>r.why))], nx=[...new Set(all.flatMap(r=>r.next||[]))], tl=[...new Set(all.flatMap(r=>r.tell||[]))];
+  const has=why.length||nx.length||tl.length;
+  return card(h2('🗒️ お子さまのひとこと')+(has?`${tl.length?`<p class="text-xs font-bold text-pink-400">親に聞いてほしいこと・話したいこと</p><div class="mt-1 mb-3 flex flex-wrap gap-2">${tl.map(t=>`<span class="px-3 py-1.5 rounded-full bg-pink-400/15 text-slate-800 text-xs font-bold">${t}</span>`).join('')}</div>`:''}${why.length?`<p class="text-xs font-bold text-slate-500">やってみて感じたこと</p><p class="mt-1 text-sm">${why.join('／')}</p>`:''}${nx.length?`<p class="mt-3 text-xs font-bold text-slate-500">選ぶ前に確かめたいこと</p><div class="mt-1 flex flex-wrap gap-2">${nx.map(n=>`<span class="px-3 py-1 rounded-full bg-quest-50 text-quest-700 text-xs font-bold">${NEXTL('next',n)}</span>`).join('')}</div>`:''}`:`<p class="text-sm text-slate-500">お子さまがふりかえりを書くと、ここに表示されます。</p>`)+`<p class="mt-3 text-[11px] text-slate-400">本人が共有している感想だけが届きます。進み具合やタイプ・数値は表示されません。</p>`);
 }
 function parentKnow(){
   return `<div class="p-4 space-y-4">
@@ -372,6 +374,8 @@ function compareCard(){
 function parentTalk(){
   const why=S.share?[...new Set(Object.values(S.reflect).flatMap(r=>r.why))]:[];
   const qs=['今日のクエストで、いちばんおもしろかったのはどこ？','その仕事で「もっと知りたい」と思ったことはある？'];
+  const tell=S.share?[...new Set(Object.values(S.reflect).flatMap(r=>r.tell||[]))]:[];
+  if(tell.length) qs.unshift('お子さまは「'+tell[0]+'」とのこと。まず、その話から聞いてみよう');
   if(why.length) qs.push('「'+why[0]+'」って、どんなところが？');
   const ng=[['「とりあえず大学に行っておきなさい」','「行きたい理由と、行った先でやってみたいことを聞かせて？」'],['「石の上にも三年だよ」','「いまのしんどさは、何が原因だと思う？」'],['「安定した会社が一番」','「どんな働き方だと、毎日が楽しそう？」']];
   return `<div class="p-4 space-y-4">
@@ -397,7 +401,7 @@ function jobSheet(k){
   const j=JOBS[k];
   openSheet(sheetHead(j.icon+' '+j.job)+`<div class="overflow-y-auto px-5 pb-8 space-y-3">
     <p class="text-sm text-slate-600 leading-relaxed">${j.real}</p>
-    ${[['🕘 仕事の一日の流れ',j.day],['😮‍💨 大変なところ',j.hard],['📚 学校の勉強とのつながり',j.study]].map(([a,b])=>`<div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><p class="text-xs font-bold text-quest-700">${a}</p><p class="mt-1 text-sm">${b}</p></div>`).join('')}
+    ${[['🕘 仕事の一日の流れ',j.day],['💡 意外な一面',j.surprise],['😮‍💨 大変なところ',j.hard],['📚 学校の勉強とのつながり',j.study],['🎓 つながる進路（一例）',j.path]].map(([a,b])=>`<div class="rounded-xl bg-slate-50 border border-slate-200 p-3"><p class="text-xs font-bold text-quest-700">${a}</p><p class="mt-1 text-sm">${b}</p></div>`).join('')}
     <div class="rounded-xl bg-spark-400/20 border border-spark-400/50 p-3 text-xs leading-relaxed"><b>求人票や説明だけでは分からないこと</b>：勤務時間・休日・職場の雰囲気・教育体制は、学校の先生や企業に質問して確かめましょう。</div>
     <button data-act="save" data-k="j:${k}" data-keep="1" class="w-full py-3 rounded-xl ${isSaved('j:'+k)?'bg-slate-100 text-slate-600':'bg-quest-600 text-white'} font-bold">${isSaved('j:'+k)?'♥ 気になるに追加済み':'♡ 気になるに追加'}</button>
     <p class="text-[11px] text-slate-400">※ 仕事の一例です。実際の内容は会社や職場によって異なります。</p></div>`);
@@ -437,6 +441,8 @@ function renderPlayer(){
       <div class="mt-1.5 flex flex-wrap gap-2">${(isP?PWHY:WHY).map(w=>chip('why',w,R.why.includes(w))).join('')}</div>
       <p class="mt-3 text-xs font-bold text-slate-600">${isP?'お子さまに聞いてみたいこと':'選ぶ前に、確かめたいことは？'}</p>
       <div class="mt-1.5 flex flex-wrap gap-2">${isP?PASK.map(a=>chip('ask',a,(R.ask||[]).includes(a))).join(''):NEXT.map(n=>chip('next',n[0],R.next.includes(n[0]))).join('')}</div>
+      ${isP?'':`<p class="mt-3 text-xs font-bold text-slate-600">親に聞いてほしいこと・話したいこと</p>
+      <div class="mt-1.5 flex flex-wrap gap-2">${TELL.map(t=>chip('tell',t,(R.tell||[]).includes(t))).join('')}</div>`}
       <p class="mt-3 text-[11px] text-slate-500">答えは変わってもOK。まだ決まっていなくて大丈夫です。</p></div>
     ${q.note?`<p class="mt-3 text-[11px] text-slate-400">${q.note}</p>`:''}
     <p class="mt-3 text-xs font-bold text-quest-700 bg-quest-50 rounded-xl px-3 py-2 text-left">💬 ${mate}</p>
